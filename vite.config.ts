@@ -16,7 +16,7 @@ export default defineConfig({
       registerType: 'autoUpdate',
       includeAssets: ['apple-touch-icon.png'],
       manifest: {
-        name: 'DREWizja — meble 3D',
+        name: 'DREWizja',
         short_name: 'DREWizja',
         description: 'Szkic → model 3D zabudowy meblowej',
         lang: 'pl',

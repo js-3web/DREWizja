@@ -1,4 +1,4 @@
-# SPECYFIKACJA DLA CLAUDE CODE — aplikacja „Szkic → Meble 3D” (robocza nazwa: TEK-MEBLE3D)
+# SPECYFIKACJA DLA CLAUDE CODE — aplikacja **DREWizja** („Szkic → Meble 3D”; dawna robocza nazwa: TEK-MEBLE3D)
 
 > Ten plik jest materiałem wejściowym dla Claude Code. Umieść go w katalogu projektu jako `SPEC.md`
 > (a skrót zasad pracy jako `CLAUDE.md`, sekcja 14). Claude Code: czytaj całość przed pierwszym kodem,

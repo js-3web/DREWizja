@@ -1,6 +1,6 @@
 # CLAUDE.md — zasady pracy w repo DREWizja
 
-Pełna specyfikacja: `SPEC.md` (czytaj przed pracą). Skrót zasad (SPEC sekcja 14):
+Nazwa aplikacji: **DREWizja** (dokładnie ta pisownia). Pełna specyfikacja: `SPEC.md` (czytaj przed pracą). Skrót zasad (SPEC sekcja 14):
 
 - Pracuj etapami z SPEC sekcja 12; po każdym etapie: podsumowanie, jak uruchomić, co przetestować, pytania.
 - Użytkownik **nie jest programistą** i chce się uczyć IT: przy każdej nowej koncepcji dodaj 2–4 zdania „co to jest i po co tu jest”.

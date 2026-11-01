@@ -1,4 +1,6 @@
-# DREWizja — szkic → meble 3D
+# DREWizja
+
+Szkic → meble 3D.
 
 Aplikacja dla stolarza: z JSON projektu (później: ze zdjęcia szkicu przez AI) generuje model 3D zabudowy
 (kuchnie, garderoby) do pokazania klientowi. Specyfikacja: [SPEC.md](SPEC.md).
