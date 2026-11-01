@@ -1,0 +1,157 @@
+.loading {
+  display: grid;
+  place-items: center;
+  height: 100%;
+}
+.app {
+  display: grid;
+  height: 100dvh;
+  grid-template-rows: auto 1fr;
+  grid-template-columns: 1fr;
+}
+.app.panel-open {
+  grid-template-columns: 1fr 380px;
+}
+.toolbar {
+  grid-column: 1 / -1;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  align-items: center;
+  padding: 6px 8px;
+  padding-top: max(6px, env(safe-area-inset-top));
+  background: var(--panel);
+  border-bottom: 1px solid var(--border);
+}
+.toolbar select {
+  max-width: 220px;
+}
+.brand {
+  margin-right: 4px;
+}
+.status {
+  font-size: 12px;
+  color: var(--muted);
+  margin-left: auto;
+}
+.status.off {
+  color: var(--warn-text);
+}
+.viewport {
+  position: relative;
+  min-height: 0;
+}
+.warnings,
+.toast {
+  position: absolute;
+  left: 8px;
+  right: 8px;
+  padding: 8px 10px;
+  border-radius: 8px;
+  font-size: 13px;
+  background: var(--warn-bg);
+  color: var(--warn-text);
+  white-space: pre-wrap;
+}
+.warnings {
+  top: 8px;
+}
+.toast {
+  bottom: 8px;
+  cursor: pointer;
+}
+.side {
+  overflow: auto;
+  background: var(--panel);
+  border-left: 1px solid var(--border);
+  padding: 8px 12px calc(12px + env(safe-area-inset-bottom));
+  font-size: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.side h3 {
+  margin: 4px 0;
+  font-size: 15px;
+}
+.side p {
+  margin: 4px 0;
+}
+.side table {
+  border-collapse: collapse;
+  width: 100%;
+  font-size: 13px;
+}
+.side td,
+.side th {
+  border-bottom: 1px solid var(--border);
+  padding: 3px 4px;
+  text-align: left;
+}
+.hint {
+  color: var(--muted);
+  font-size: 13px;
+}
+.json {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  flex: 1;
+  min-height: 300px;
+}
+.json textarea {
+  flex: 1;
+  min-height: 240px;
+  font:
+    12px/1.4 ui-monospace,
+    Menlo,
+    Consolas,
+    monospace;
+  background: var(--bg);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 8px;
+}
+.row {
+  display: flex;
+  gap: 6px;
+}
+.errors {
+  color: var(--danger);
+  font-size: 12px;
+  margin: 0;
+  padding-left: 18px;
+}
+
+/* Telefon (pionowo): panel pod widokiem 3D zamiast obok. */
+@media (max-width: 800px) {
+  .app.panel-open {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto 1fr 45dvh;
+  }
+  .side {
+    border-left: none;
+    border-top: 1px solid var(--border);
+  }
+  /* Jeden wiersz przewijany palcem w poziomie zamiast 3 wierszy przycisków. */
+  .toolbar {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  .toolbar > * {
+    flex-shrink: 0;
+  }
+  .toolbar button,
+  .toolbar select {
+    font-size: 13px;
+    padding: 4px 8px;
+  }
+  .toolbar select {
+    max-width: 160px;
+  }
+  .status {
+    margin-left: 4px;
+  }
+}
