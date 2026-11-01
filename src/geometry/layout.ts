@@ -44,6 +44,7 @@ export type Layer = 'base' | 'tall' | 'wall'
 
 export interface PlacedCabinet {
   runId: string
+  wallId: WallIdT
   layer: Layer
   cabinet: CabinetT
   /** Odległość lewego boku szafki od początku ściany. */
@@ -64,6 +65,7 @@ export function placeRun(run: RunT, room: ProjectT['room']): PlacedCabinet[] {
     for (const cab of run.layers[layer] ?? []) {
       out.push({
         runId: run.id,
+        wallId: run.wallId,
         layer,
         cabinet: cab,
         along,

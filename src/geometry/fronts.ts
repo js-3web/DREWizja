@@ -2,15 +2,11 @@
  * Automatyczny podział frontów z uwzględnieniem szczelin (SPEC sekcja 7.3).
  * Fronty są nakładane na korpus („nakładkowe”), więc zewnętrzny obrys = obrys korpusu minus pół szczeliny z każdej strony.
  */
-import type { FrontT } from '../model/schema'
+import type { CabinetT, FrontLayoutT, FrontT } from '../model/schema'
 
 export const DEFAULT_GAP = 3
 
-export type FrontLayout =
-  | { kind: 'door' } // jedne drzwi (zawias wg szerokości: lewy)
-  | { kind: 'doors2' } // dwoje drzwi
-  | { kind: 'drawers'; heights: number[]; as?: FrontT['kind'] } // fronty jeden nad drugim, od dołu; wysokości „w osiach” sumują się do wysokości korpusu (as = np. 'door-right' dla lodówki)
-  | { kind: 'flap' } // klapa do góry
+export type FrontLayout = FrontLayoutT
 
 export function makeFronts(
   idPrefix: string,
@@ -25,6 +21,8 @@ export function makeFronts(
   const r = (n: number) => Math.round(n)
 
   switch (layout.kind) {
+    case 'none':
+      return []
     case 'door':
       return [
         {
@@ -93,4 +91,31 @@ export function makeFronts(
       })
     }
   }
+}
+
+/**
+ * Odtwarza fronty szafki z jej przepisu (layout) po zmianie wymiarów.
+ * Wysokości szuflad są skalowane proporcjonalnie do nowej wysokości korpusu (zaokrąglenie do mm,
+ * reszta dopisana do najwyższej szuflady, żeby suma zgadzała się co do milimetra).
+ */
+export function rebuildFronts(cab: CabinetT, gap = DEFAULT_GAP): FrontT[] {
+  if (!cab.layout) return cab.fronts
+  const style = cab.fronts[0]?.style ?? 'flat'
+  const materialId = cab.fronts[0]?.materialId ?? 'front-white-lacquer'
+  let layout: FrontLayoutT = cab.layout
+  if (layout.kind === 'drawers') {
+    layout = { ...layout, heights: scaleHeights(layout.heights, cab.height) }
+  }
+  return makeFronts(cab.id, cab.width, cab.height, layout, { style, materialId, gap })
+}
+
+/** Skaluje listę wysokości tak, by sumowała się dokładnie do `total`. */
+export function scaleHeights(heights: number[], total: number): number[] {
+  const sum = heights.reduce((a, b) => a + b, 0)
+  if (sum === total) return heights
+  const scaled = heights.map((h) => Math.max(1, Math.round((h * total) / sum)))
+  const diff = total - scaled.reduce((a, b) => a + b, 0)
+  const iMax = scaled.indexOf(Math.max(...scaled))
+  scaled[iMax] += diff
+  return scaled
 }

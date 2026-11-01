@@ -4,8 +4,10 @@
  * UWAGA: to dane PRZYKŁADOWE do etapu 1 (generator 3D z ręcznie wpisanego JSON).
  * Wymiary inspirowane opisem szkicu w SPEC (386,5 cm, 170,5 cm, moduły 34/60/60/45/80, murek ~21 cm),
  * ale nie są odczytem rzeczywistego szkicu — ten zrobi moduł AI w etapie 4.
+ * Służy też jako szablon „Nowy projekt” i dane testowe.
  */
 import { makeFronts } from '../geometry/fronts'
+import { MATERIAL_LIBRARY } from '../materials/library'
 import { SCHEMA_VERSION, type CabinetT, type ProjectT } from './schema'
 
 const FRONT = 'front-white-lacquer'
@@ -24,7 +26,8 @@ function cab(o: Opts, fronts: Parameters<typeof makeFronts>[3] | null): CabinetT
     carcassMaterialId: CARCASS,
     handle: { type: 'bar', position: 'top' },
     ...o,
-    fronts: fronts ? makeFronts(o.id, o.width, o.height, fronts, { style: 'flat', materialId: FRONT }) : [],
+    layout: fronts ?? undefined,
+    fronts: fronts ? makeFronts(o.id, o.width, o.height, fronts, { style: 'shaker', materialId: FRONT }) : [],
   }
 }
 
@@ -143,34 +146,6 @@ export function exampleProject(): ProjectT {
         },
       },
     ],
-    materials: [
-      {
-        id: FRONT,
-        name: 'Lakier biały mat (MDF)',
-        category: 'lacquer',
-        finish: 'matt',
-        color: '#f1efe9',
-        roughness: 0.6,
-        metalness: 0,
-      },
-      {
-        id: CARCASS,
-        name: 'Płyta laminowana biała',
-        category: 'laminate',
-        finish: 'matt',
-        color: '#e6e6e3',
-        roughness: 0.7,
-        metalness: 0,
-      },
-      {
-        id: 'worktop-oak',
-        name: 'Blat dąb (laminat)',
-        category: 'laminate',
-        finish: 'structured',
-        color: '#b08a5a',
-        roughness: 0.55,
-        metalness: 0,
-      },
-    ],
+    materials: MATERIAL_LIBRARY.filter((m) => [FRONT, CARCASS, 'worktop-oak'].includes(m.id)),
   }
 }

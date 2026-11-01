@@ -5,14 +5,16 @@
  * React wywołuje ją ponownie i aktualizuje tylko to, co się zmieniło.
  */
 import { useEffect, useRef, useState } from 'react'
-import { deleteProject, listProjects, requestPersistence, saveProject, type ProjectRow } from './db/db'
+import { deleteProject, listProjects, loadSettings, requestPersistence, saveProject, type ProjectRow } from './db/db'
+import { hasBlockingErrors, validateGeometry } from './geometry/validate'
 import { exampleProject } from './model/example'
 import { migrateAndValidate } from './model/migrate'
 import type { ProjectT } from './model/schema'
-import { runOverflow } from './geometry/layout'
 import { useStore, type CameraPreset } from './store/projectStore'
 import { Scene } from './ui/Scene'
+import { SettingsDialog } from './ui/SettingsDialog'
 import { SidePanel } from './ui/SidePanel'
+import { SketchWizard } from './ui/SketchWizard'
 import './App.css'
 
 function useOnline() {
@@ -30,11 +32,14 @@ function useOnline() {
   return online
 }
 
-function download(name: string, text: string) {
+function download(name: string, data: string | Blob) {
   const a = document.createElement('a')
-  a.href = URL.createObjectURL(new Blob([text], { type: 'application/json' }))
+  a.href = URL.createObjectURL(typeof data === 'string' ? new Blob([data], { type: 'application/json' }) : data)
   a.download = name
+  // Safari wymaga, żeby link był w dokumencie w chwili kliknięcia.
+  document.body.appendChild(a)
   a.click()
+  a.remove()
   setTimeout(() => URL.revokeObjectURL(a.href), 1000)
 }
 
@@ -55,6 +60,11 @@ export default function App() {
   const [panelOpen, setPanelOpen] = useState(() => window.innerWidth > 800)
   const [msg, setMsg] = useState<string | null>(null)
   const fileInput = useRef<HTMLInputElement>(null)
+  const [wizardOpen, setWizardOpen] = useState(false)
+  const [settingsOpen, setSettingsOpen] = useState(false)
+  const [pdf, setPdf] = useState<{ busy: boolean; file?: File }>({ busy: false })
+  const settings = useStore((s) => s.settings)
+  const setSettings = useStore((s) => s.setSettings)
   const online = useOnline()
 
   const refresh = async () => setRows(await listProjects())
@@ -71,9 +81,10 @@ export default function App() {
       const r = migrateAndValidate(list[0].data)
       if (r.ok) setProject(r.project, false)
       else setMsg('Nie udało się otworzyć projektu: ' + r.errors.join('; '))
+      setSettings(await loadSettings())
       setPersisted(await requestPersistence())
     })()
-  }, [setProject])
+  }, [setProject, setSettings])
 
   // Autozapis: 600 ms po ostatniej zmianie projekt trafia do IndexedDB.
   useEffect(() => {
@@ -139,8 +150,57 @@ export default function App() {
 
   const apply = (p: ProjectT) => setProject(p)
 
+  const createFromSketch = async (p: ProjectT) => {
+    setProject(p, false)
+    await saveProject(p)
+    await refresh()
+    setPanelOpen(true)
+    setMsg('Projekt utworzony ze szkicu. Sprawdź zakładkę „Kontrola” i otwarte pytania w „Projekt”.')
+  }
+
+  const makePdf = async () => {
+    if (!project) return
+    const issues = validateGeometry(project)
+    if (hasBlockingErrors(issues)) {
+      setPanelOpen(true)
+      setMsg(
+        'PDF zablokowany — projekt ma błędy (zakładka „Kontrola”):\n' +
+          issues
+            .filter((i) => i.severity === 'error')
+            .slice(0, 5)
+            .map((i) => '• ' + i.message)
+            .join('\n'),
+      )
+      return
+    }
+    setMsg(null) // jeden komunikat naraz — nie nakładają się na siebie
+    setPdf({ busy: true })
+    useStore.getState().select(null)
+    try {
+      // Dwie klatki animacji: scena odświeża się bez podświetlenia zaznaczonej szafki.
+      await new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r)))
+      const { buildClientPdf } = await import('./pdf/pdf')
+      const blob = await buildClientPdf(project, settings)
+      const name = `${project.name.replace(/[^\p{L}\p{N}_-]+/gu, '_')}.pdf`
+      setPdf({ busy: false, file: new File([blob], name, { type: 'application/pdf' }) })
+    } catch (e) {
+      setPdf({ busy: false })
+      setMsg('Nie udało się utworzyć PDF: ' + (e as Error).message)
+    }
+  }
+
+  const sharePdf = async (file: File) => {
+    try {
+      await navigator.share({ files: [file], title: file.name })
+    } catch {
+      /* anulowane przez użytkownika */
+    }
+  }
+
   if (!project) return <div className="loading">Wczytywanie…</div>
-  const warnings = project.runs.flatMap((r) => runOverflow(r, project.room))
+  const errorCount = validateGeometry(project).filter((i) => i.severity === 'error').length
+  const canShareFiles =
+    !!pdf.file && typeof navigator.canShare === 'function' && navigator.canShare({ files: [pdf.file] })
 
   return (
     <div className={`app ${panelOpen ? 'panel-open' : ''}`}>
@@ -154,8 +214,15 @@ export default function App() {
           ))}
           {!rows.some((r) => r.id === project.id) && <option value={project.id}>{project.name}</option>}
         </select>
-        <button onClick={newExample} title="Nowy projekt (z przykładu)">
-          ＋ Nowy
+        <button
+          className="primary"
+          onClick={() => setWizardOpen(true)}
+          title="Nowy projekt ze zdjęcia szkicu (Asystent AI)"
+        >
+          📷 Ze szkicu
+        </button>
+        <button onClick={newExample} title="Nowy projekt z szablonu (przykład kuchni w L)">
+          ＋ Szablon
         </button>
         <button onClick={duplicate} title="Duplikuj projekt (wariant)">
           ⧉ Kopia
@@ -185,6 +252,9 @@ export default function App() {
         <button onClick={toggleWalls} title="Pokaż/ukryj ściany">
           Ściany
         </button>
+        <button onClick={makePdf} disabled={pdf.busy} title="PDF dla klienta: izometria, rzuty ścian, materiały">
+          {pdf.busy ? 'Tworzę PDF…' : '📄 PDF'}
+        </button>
         <button onClick={exportJson} title="Zapisz plik JSON (kopia zapasowa)">
           ⭳ Eksport
         </button>
@@ -205,6 +275,9 @@ export default function App() {
         <button onClick={remove} className="danger" title="Usuń projekt z tego urządzenia">
           🗑
         </button>
+        <button onClick={() => setSettingsOpen(true)} title="Ustawienia warsztatu">
+          ⚙
+        </button>
         <button onClick={() => setPanelOpen(!panelOpen)}>{panelOpen ? 'Ukryj panel' : 'Panel'}</button>
         <span className={`status ${online ? 'on' : 'off'}`} title="Stan połączenia i zapisu lokalnego">
           {online ? 'online' : 'offline'} ·{' '}
@@ -214,11 +287,19 @@ export default function App() {
 
       <main className="viewport">
         <Scene project={project} />
-        {warnings.length > 0 && (
-          <div className="warnings">
-            {warnings.map((w) => (
-              <div key={w}>⚠ {w}</div>
-            ))}
+        {errorCount > 0 && (
+          <div className="warnings" onClick={() => setPanelOpen(true)}>
+            ⚠ Błędy w projekcie: {errorCount} — szczegóły w panelu, zakładka „Kontrola”.
+          </div>
+        )}
+        {pdf.file && (
+          <div className="toast pdf">
+            <span>PDF gotowy: {pdf.file.name}</span>
+            <button onClick={() => download(pdf.file!.name, pdf.file!)}>Pobierz</button>
+            {canShareFiles && <button onClick={() => sharePdf(pdf.file!)}>Udostępnij…</button>}
+            <button className="link" onClick={() => setPdf({ busy: false })}>
+              ✕
+            </button>
           </div>
         )}
         {msg && (
@@ -230,6 +311,8 @@ export default function App() {
       </main>
 
       {panelOpen && <SidePanel project={project} onApply={apply} />}
+      {wizardOpen && <SketchWizard onClose={() => setWizardOpen(false)} onCreate={createFromSketch} />}
+      {settingsOpen && <SettingsDialog onClose={() => setSettingsOpen(false)} />}
     </div>
   )
 }

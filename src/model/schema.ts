@@ -42,6 +42,22 @@ export const Obstacle = z.object({
 
 export const FrontStyleId = z.enum(['flat', 'shaker', 'frame-panel'])
 
+/**
+ * Układ frontów szafki — przepis, z którego da się odtworzyć fronty po zmianie wymiaru szafki.
+ * drawers: wysokości „w osiach” od dołu, sumują się do wysokości korpusu.
+ */
+export const FrontLayout = z.discriminatedUnion('kind', [
+  z.object({ kind: z.literal('door') }),
+  z.object({ kind: z.literal('doors2') }),
+  z.object({ kind: z.literal('flap') }),
+  z.object({ kind: z.literal('none') }),
+  z.object({
+    kind: z.literal('drawers'),
+    heights: z.array(mmPos).min(1),
+    as: z.enum(['door-left', 'door-right', 'drawer', 'flap-up', 'glass', 'blind']).optional(),
+  }),
+])
+
 export const Front = z.object({
   id: z.string().min(1),
   kind: z.enum(['door-left', 'door-right', 'drawer', 'flap-up', 'glass', 'blind']),
@@ -68,6 +84,8 @@ export const Cabinet = z.object({
     backThickness: z.union([z.literal(3), z.literal(8), z.literal(18)]).default(3),
   }),
   fronts: z.array(Front).default([]),
+  /** Przepis na fronty (opcjonalny) — używany przy zmianie wymiarów szafki w panelu. */
+  layout: FrontLayout.optional(),
   appliance: z.enum(['hob', 'oven', 'fridge', 'dishwasher', 'sink', 'hood', 'microwave']).optional(),
   handle: z
     .object({
@@ -122,12 +140,22 @@ export const Material = z.object({
   color: z.string().regex(/^#[0-9a-fA-F]{6}$/),
   roughness: z.number().min(0).max(1),
   metalness: z.number().min(0).max(1).default(0),
+  manufacturer: z.string().optional(),
+  code: z.string().optional(),
+  /** Proceduralna tekstura (etap bez zdjęć dekorów): 'wood' = usłojenie zgodne z kierunkiem elementu. */
+  texture: z.enum(['wood']).optional(),
+  /** Do jakich elementów materiał jest dozwolony. Brak = wszędzie. */
+  allowedFor: z.array(z.enum(['front', 'carcass', 'worktop', 'plinth'])).optional(),
+  /** Dozwolone style frontu dla tego materiału (np. ramiak tylko z drewna/forniru). Brak = wszystkie. */
+  frontStyles: z.array(FrontStyleId).optional(),
+  note: z.string().optional(),
 })
 
 export const Project = z.object({
   id: z.string().min(1),
   name: z.string().min(1),
   client: z.string().optional(),
+  notes: z.string().optional(),
   createdAt: z.string(),
   updatedAt: z.string(),
   version: z.literal(SCHEMA_VERSION),
@@ -156,6 +184,7 @@ export type WallIdT = z.infer<typeof WallId>
 export type WallT = z.infer<typeof Wall>
 export type ObstacleT = z.infer<typeof Obstacle>
 export type FrontT = z.infer<typeof Front>
+export type FrontLayoutT = z.infer<typeof FrontLayout>
 export type CabinetT = z.infer<typeof Cabinet>
 export type RunT = z.infer<typeof Run>
 export type MaterialT = z.infer<typeof Material>

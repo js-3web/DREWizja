@@ -9,6 +9,7 @@
  */
 import { create } from 'zustand'
 import type { ProjectT } from '../model/schema'
+import { defaultSettings, type SettingsT } from '../model/settings'
 
 const HISTORY_LIMIT = 50
 
@@ -21,6 +22,8 @@ interface State {
   selectedCabinetId: string | null
   showWalls: boolean
   cameraPreset: { name: CameraPreset; nonce: number }
+  settings: SettingsT
+  setSettings: (s: SettingsT) => void
   /** Ustawia projekt; record=false przy otwieraniu (nie dokłada do historii). */
   setProject: (p: ProjectT, record?: boolean) => void
   undo: () => void
@@ -39,6 +42,8 @@ export const useStore = create<State>((set, get) => ({
   selectedCabinetId: null,
   showWalls: true,
   cameraPreset: { name: 'iso', nonce: 0 },
+  settings: defaultSettings(),
+  setSettings: (settings) => set({ settings }),
 
   setProject: (p, record = true) => {
     const cur = get().project

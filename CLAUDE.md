@@ -16,6 +16,12 @@ Nazwa aplikacji: **DREWizja** (dokładnie ta pisownia). Pełna specyfikacja: `SP
 - Instalowalna jako PWA na komputerze i iPhonie, działa offline (service worker, `vite-plugin-pwa`).
 - Baza danych lokalnie na urządzeniu (IndexedDB przez Dexie, `src/db/db.ts`) + eksport/import JSON jako kopia.
 
+## Decyzje użytkownika (2026-11-01)
+- **AI: tryb „Asystent AI”** — aplikacja generuje prompt, użytkownik wkleja go w swoim czacie AI ze zdjęciem
+  szkicu, odpowiedź (JSON) wkleja z powrotem. Brak API, klucza i backendu (SPEC sekcje 3 i 6 w tym zakresie nieaktualne).
+- **Klient dostaje PDF** (izometria, rzuty ścian z wymiarami, materiały) zamiast linku (SPEC 11 — link nieaktualny).
+- **Odbiorca: tylko własny warsztat** (bez kont, SaaS, płatności).
+
 ## Komendy
 - `npm run dev` — serwer deweloperski, `npm test` — testy (Vitest), `npm run lint` — oxlint,
   `npm run typecheck` — TypeScript, `npm run build` — wersja produkcyjna do `dist/`.
