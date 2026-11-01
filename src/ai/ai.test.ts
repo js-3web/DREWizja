@@ -166,3 +166,72 @@ describe('prompty', () => {
     expect(t).toContain('"wall": "A"')
   })
 })
+
+describe('tolerancja na odpowiedzi innych czatów AI (błędy zgłoszone z ChatGPT)', () => {
+  // Odtworzenie zgłoszenia: width_cm null, przeszkoda bez h/d, nieznana nazwa warstwy łańcucha.
+  const gpt = JSON.stringify({
+    runs: [
+      {
+        wall: 'A',
+        start_offset_cm: 0,
+        floor: [{ type: 'base', width_cm: 60, fronts: { kind: 'door' }, confidence: 0.9 }],
+      },
+      {
+        wall: 'b',
+        start_offset_cm: 60,
+        floor: [
+          { type: 'lower', width_cm: 45, fronts: { kind: 'drawer', count: '3', heights_cm: null }, confidence: 0.8 },
+          { type: 'base', width_cm: null, fronts: null, appliance: 'none', confidence: 0.3 },
+          { type: 'column', width_cm: null, fronts: { kind: 'doors' }, appliance: 'refrigerator', confidence: 0.3 },
+        ],
+      },
+    ],
+    obstacles: [{ kind: 'murek', wall: 'A', x_cm: 0, y_cm: 0, w_cm: 21, h_cm: null, d_cm: null }],
+    dimension_chains: [
+      { wall: 'A', layer: 'base', segments_cm: [60], total_cm: 60 },
+      { wall: 'B', layer: 'wall', segments_cm: [45, null], total_cm: null },
+      { wall: 'A', layer: 'total', segments_cm: [], total_cm: 300 },
+    ],
+    warnings: null,
+    questions: ['Szerokości szafek 2 i 3 na ścianie B nieczytelne'],
+  })
+
+  it('odczyt przechodzi walidację, synonimy przetłumaczone', () => {
+    const r = parseReading(gpt)
+    if (!r.ok) throw new Error(r.errors.join('\n'))
+    const b = r.reading.runs[1]
+    expect(b.wall).toBe('B')
+    expect(b.floor.map((c) => c.type)).toEqual(['base', 'base', 'tall'])
+    expect(b.floor[0].fronts).toMatchObject({ kind: 'drawers', count: 3 })
+    expect(b.floor[1].fronts.kind).toBe('door')
+    expect(b.floor[2].fronts.kind).toBe('doors2')
+    expect(b.floor[2].appliance).toBe('fridge')
+    expect(r.reading.dimension_chains.map((c) => c.layer)).toEqual(['floor', 'upper', 'overall'])
+  })
+
+  it('brakujące szerokości blokują utworzenie projektu z czytelnym komunikatem', () => {
+    const r = parseReading(gpt)
+    if (!r.ok) throw new Error()
+    expect(() => convertReading(r.reading, input, settings)).toThrow(/Ściana B, szafki stojące #2.*#3/)
+  })
+
+  it('po uzupełnieniu szerokości: projekt powstaje, murek do sufitu bez głębokości → ostrzeżenia', () => {
+    const r = parseReading(gpt)
+    if (!r.ok) throw new Error()
+    r.reading.runs[1].floor[1].width_cm = 60
+    r.reading.runs[1].floor[2].width_cm = 60
+    const res = convertReading(r.reading, input, settings)
+    expect(validateProject(res.project).ok).toBe(true)
+    const murek = res.project.room.obstacles[0]
+    expect(murek.h).toBe(2600)
+    expect(murek.d).toBe(0)
+    expect(res.warnings.some((w) => w.includes('brak wysokości'))).toBe(true)
+    expect(res.warnings.some((w) => w.includes('NIE będzie sprawdzana'))).toBe(true)
+  })
+
+  it('nieznana wartość bez synonimu nadal jest błędem (aplikacja nie zgaduje)', () => {
+    const r = parseReading('{"runs":[{"wall":"A","floor":[{"type":"komoda","width_cm":60}]}]}')
+    expect(r.ok).toBe(false)
+    if (!r.ok) expect(r.errors[0]).toContain('wartość spoza listy')
+  })
+})

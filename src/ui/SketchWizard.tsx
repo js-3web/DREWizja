@@ -9,7 +9,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { convertReading } from '../ai/convert'
 import { buildCorrectionPrompt, buildReadingPrompt } from '../ai/prompt'
-import { parseReading, type ReadingCabinetT, type SketchReadingT } from '../ai/reading'
+import { missingWidths, parseReading, type ReadingCabinetT, type SketchReadingT } from '../ai/reading'
 import { kvGet, kvSet } from '../db/db'
 import type { ProjectT } from '../model/schema'
 import { useStore } from '../store/projectStore'
@@ -71,6 +71,14 @@ const FRONT_PL = {
   glass: 'witryna',
   none: 'brak',
 } as const
+const OBST_PL = {
+  murek: 'murek',
+  window: 'okno',
+  door: 'drzwi',
+  pipe: 'pion',
+  radiator: 'grzejnik',
+  other: 'inna',
+} as const
 const APPL_PL = {
   hob: 'płyta',
   oven: 'piekarnik',
@@ -127,6 +135,7 @@ export function SketchWizard({ onClose, onCreate }: { onClose: () => void; onCre
   }, [d, roomOk, settings])
 
   if (!d) return null
+  const missing = d.reading ? missingWidths(d.reading) : []
   const up = (patch: Partial<Draft>) => setD({ ...d, ...patch })
 
   const share = async (text: string) => {
@@ -157,6 +166,15 @@ export function SketchWizard({ onClose, onCreate }: { onClose: () => void; onCre
       i !== ri ? r : { ...r, [list]: r[list].map((c, j) => (j === ci ? { ...c, ...patch, confidence: 1 } : c)) },
     )
     up({ reading: { ...d.reading, runs } })
+  }
+  type Obs = SketchReadingT['obstacles'][number]
+  const editObs = (oi: number, patch: Partial<Obs> | null) => {
+    if (!d.reading) return
+    const obstacles =
+      patch === null
+        ? d.reading.obstacles.filter((_, j) => j !== oi)
+        : d.reading.obstacles.map((o, j) => (j === oi ? { ...o, ...patch } : o))
+    up({ reading: { ...d.reading, obstacles } })
   }
   const delCab = (ri: number, list: 'floor' | 'upper', ci: number) => {
     if (!d.reading) return
@@ -220,7 +238,9 @@ export function SketchWizard({ onClose, onCreate }: { onClose: () => void; onCre
                 key={`${ci}-${c.width_cm}`}
                 className="narrow"
                 inputMode="decimal"
-                defaultValue={String(c.width_cm).replace('.', ',')}
+                defaultValue={c.width_cm === null ? '' : String(c.width_cm).replace('.', ',')}
+                placeholder="?"
+                aria-invalid={c.width_cm === null}
                 onBlur={(e) => {
                   const v = num(e.target.value)
                   if (v > 0 && v !== c.width_cm) editCab(ri, list, ci, { width_cm: v })
@@ -290,7 +310,7 @@ export function SketchWizard({ onClose, onCreate }: { onClose: () => void; onCre
         ))}
         <tr>
           <td colSpan={2}>Suma</td>
-          <td>{String(Math.round(cabs.reduce((s, c) => s + c.width_cm, 0) * 10) / 10).replace('.', ',')}</td>
+          <td>{String(Math.round(cabs.reduce((s, c) => s + (c.width_cm ?? 0), 0) * 10) / 10).replace('.', ',')}</td>
           <td colSpan={4} />
         </tr>
       </tbody>
@@ -471,7 +491,18 @@ export function SketchWizard({ onClose, onCreate }: { onClose: () => void; onCre
                   </ul>
                 </div>
               )}
-              {preview && 'error' in preview && <div className="box err">{preview.error}</div>}
+              {missing.length > 0 ? (
+                <div className="box err">
+                  <b>Uzupełnij szerokości nieczytelne na szkicu (pola „?” w tabeli):</b>
+                  <ul>
+                    {missing.map((m) => (
+                      <li key={m}>{m}</li>
+                    ))}
+                  </ul>
+                </div>
+              ) : (
+                preview && 'error' in preview && <div className="box err">{preview.error}</div>
+              )}
               {d.reading.runs.map((r, ri) => (
                 <section key={ri}>
                   <h4>
@@ -492,6 +523,58 @@ export function SketchWizard({ onClose, onCreate }: { onClose: () => void; onCre
                   )}
                 </section>
               ))}
+              {d.reading.obstacles.length > 0 && (
+                <section>
+                  <h4>Przeszkody (cm, puste = nieodczytane)</h4>
+                  <table className="verify">
+                    <thead>
+                      <tr>
+                        <th>Rodzaj</th>
+                        <th>Ściana</th>
+                        <th>od lewej</th>
+                        <th>od podłogi</th>
+                        <th>szer.</th>
+                        <th>wys.</th>
+                        <th>głęb.</th>
+                        <th />
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {d.reading.obstacles.map((o, oi) => (
+                        <tr key={oi} className={o.w_cm === null || o.h_cm === null || o.x_cm === null ? 'low' : ''}>
+                          <td>
+                            {OBST_PL[o.kind]}
+                            {o.label ? ` (${o.label})` : ''}
+                          </td>
+                          <td>{o.wall}</td>
+                          {(['x_cm', 'y_cm', 'w_cm', 'h_cm', 'd_cm'] as const).map((k) => (
+                            <td key={k}>
+                              <input
+                                key={`${oi}-${k}-${o[k]}`}
+                                className="narrow"
+                                inputMode="decimal"
+                                placeholder="?"
+                                defaultValue={o[k] === null ? '' : String(o[k]).replace('.', ',')}
+                                onBlur={(e) => {
+                                  const raw = e.target.value.trim()
+                                  const v = raw === '' ? null : num(raw)
+                                  if (v !== null && !Number.isFinite(v)) return
+                                  if (v !== o[k]) editObs(oi, { [k]: v })
+                                }}
+                              />
+                            </td>
+                          ))}
+                          <td>
+                            <button className="link danger" onClick={() => editObs(oi, null)} title="Usuń">
+                              ✕
+                            </button>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </section>
+              )}
               {preview && 'defaultsUsed' in preview && preview.defaultsUsed.length > 0 && (
                 <details>
                   <summary>Przyjęte wartości domyślne ({preview.defaultsUsed.length})</summary>
@@ -530,7 +613,7 @@ export function SketchWizard({ onClose, onCreate }: { onClose: () => void; onCre
                 >
                   Kopiuj prompt korekty
                 </button>
-                <button className="primary" onClick={create}>
+                <button className="primary" onClick={create} disabled={missing.length > 0}>
                   Utwórz projekt 3D ✓
                 </button>
               </div>

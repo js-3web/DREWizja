@@ -505,3 +505,7 @@ button.link.danger {
 .modal-body section {
   overflow-x: auto;
 }
+.verify input[aria-invalid='true'] {
+  border-color: var(--danger);
+  background: #fde8e8;
+}

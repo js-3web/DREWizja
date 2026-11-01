@@ -20,7 +20,7 @@ import {
   type WallIdT,
 } from '../model/schema'
 import type { SettingsT } from '../model/settings'
-import type { ReadingCabinetT, SketchReadingT } from './reading'
+import { missingWidths, type ReadingCabinetT, type SketchReadingT } from './reading'
 
 export const cmToMm = (cm: number) => Math.round(cm * 10)
 
@@ -78,6 +78,10 @@ function frontLayoutFor(c: ReadingCabinetT, heightMm: number, warnings: string[]
 }
 
 export function convertReading(reading: SketchReadingT, input: ConvertInput, settings: SettingsT): ConvertResult {
+  const missing = missingWidths(reading)
+  if (missing.length) {
+    throw new Error(`Uzupełnij szerokości (nieczytelne na szkicu): ${missing.join('; ')}.`)
+  }
   const d = settings.defaults
   const warnings: string[] = []
   const layoutWarnings: string[] = []
@@ -172,7 +176,7 @@ export function convertReading(reading: SketchReadingT, input: ConvertInput, set
     }
 
     rrun.floor.forEach((c, i) => {
-      const w = cmToMm(c.width_cm)
+      const w = cmToMm(c.width_cm ?? 0) // null wykluczone na początku funkcji
       if (c.type === 'gap') {
         flush()
         along += w
@@ -253,7 +257,7 @@ export function convertReading(reading: SketchReadingT, input: ConvertInput, set
       upper = []
     }
     rrun.upper.forEach((c, i) => {
-      const w = cmToMm(c.width_cm)
+      const w = cmToMm(c.width_cm ?? 0) // null wykluczone na początku funkcji
       if (c.type === 'gap') {
         flushUpper()
         along += w
@@ -318,7 +322,7 @@ export function convertReading(reading: SketchReadingT, input: ConvertInput, set
     const rrun = reading.runs.find((r) => r.wall === ch.wall)
     if (rrun && ch.layer !== 'overall' && ch.total_cm !== null) {
       const list = ch.layer === 'floor' ? rrun.floor : rrun.upper
-      const cabSum = list.reduce((s, c) => s + c.width_cm, 0)
+      const cabSum = list.reduce((s, c) => s + (c.width_cm ?? 0), 0)
       if (list.length && Math.abs(cmToMm(cabSum) - cmToMm(ch.total_cm)) > SUM_TOL_MM) {
         warnings.push(
           `Ściana ${ch.wall} (${CHAIN_PL[ch.layer]}): suma szerokości odczytanych szafek ${fmt(cabSum)} cm ≠ wymiar całkowity ${fmt(ch.total_cm)} cm.`,
@@ -326,6 +330,43 @@ export function convertReading(reading: SketchReadingT, input: ConvertInput, set
       }
     }
   }
+
+  // --- Przeszkody: brakujące wymiary uzupełniamy jawnie (z ostrzeżeniem), nie po cichu.
+  const OBST_PL = {
+    murek: 'murek',
+    window: 'okno',
+    door: 'drzwi',
+    pipe: 'pion',
+    radiator: 'grzejnik',
+    other: 'przeszkoda',
+  } as const
+  const obstacles: ProjectT['room']['obstacles'] = []
+  reading.obstacles.forEach((o, i) => {
+    const name = `${OBST_PL[o.kind]}${o.label ? ` „${o.label}”` : ''} (ściana ${o.wall})`
+    if (o.w_cm === null) {
+      warnings.push(`Przeszkoda ${name}: brak szerokości — pominięta. Dodaj ją ręcznie lub popraw odczyt.`)
+      return
+    }
+    const opening = o.kind === 'window' || o.kind === 'door'
+    if (o.x_cm === null) warnings.push(`Przeszkoda ${name}: brak położenia — przyjęto 0 cm od lewego narożnika.`)
+    if (o.h_cm === null) warnings.push(`Przeszkoda ${name}: brak wysokości — przyjęto do sufitu (${fmtMm(H)} cm).`)
+    if (o.d_cm === null && !opening)
+      warnings.push(
+        `Przeszkoda ${name}: brak głębokości — przyjęto 0 cm, więc NIE będzie sprawdzana na kolizje z szafkami.`,
+      )
+    const y = o.y_cm === null ? 0 : cmToMm(o.y_cm)
+    obstacles.push({
+      id: `${o.kind}-${i + 1}`,
+      kind: o.kind,
+      wallId: o.wall,
+      x: o.x_cm === null ? 0 : Math.max(0, cmToMm(o.x_cm)),
+      y: Math.max(0, y),
+      w: cmToMm(o.w_cm),
+      h: o.h_cm === null ? Math.max(1, H - y) : cmToMm(o.h_cm),
+      d: o.d_cm === null || opening ? 0 : Math.max(0, cmToMm(o.d_cm)),
+      label: o.label,
+    })
+  })
 
   // Uwagi „o szkicu” (rozbieżności łańcuchów, szuflady, pokój) zostają w projekcie; uwagi o układzie — tylko na ekranie weryfikacji.
   const sketchWarnings = [...reading.warnings.map((w) => `AI: ${w}`), ...warnings]
@@ -344,17 +385,7 @@ export function convertReading(reading: SketchReadingT, input: ConvertInput, set
       depth: D,
       height: H,
       walls: (['A', 'B', 'C', 'D'] as const).map((id) => ({ id, length: wallLen(id) })),
-      obstacles: reading.obstacles.map((o, i) => ({
-        id: `${o.kind}-${i + 1}`,
-        kind: o.kind,
-        wallId: o.wall,
-        x: cmToMm(o.x_cm),
-        y: cmToMm(o.y_cm),
-        w: cmToMm(o.w_cm),
-        h: cmToMm(o.h_cm),
-        d: cmToMm(o.d_cm),
-        label: o.label,
-      })),
+      obstacles,
     },
     runs,
     materials: MATERIAL_LIBRARY.filter((m) => usedIds.has(m.id)),

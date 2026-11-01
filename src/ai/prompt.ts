@@ -86,6 +86,9 @@ ${settings.legend.trim() || '(brak)'}
 6. "appliance": hob | oven | fridge | dishwasher | sink | hood | microwave | null. Płyta grzewcza nad szafką → "hob_above": true. Zlew → "appliance": "sink" przy szafce pod zlewem.
 7. Wymiary nieodczytane → null (program przyjmie wartości domyślne: cokół ${d.plinthHeight / 10} cm, korpus dolny ${d.baseHeight / 10} cm, głębokość dolnych ${d.baseDepth / 10} cm, górnych ${d.wallDepth / 10} cm). Nie wpisuj tych wartości sam.
 8. "obstacles": murki, okna, drzwi, piony, grzejniki — x_cm od lewego narożnika ściany, y_cm od podłogi, w/h szerokość/wysokość, d_cm odstawanie od ściany (okno/drzwi = 0).
+9. Szerokość szafki nieczytelna → "width_cm": null + pytanie w "questions" (stolarz ją uzupełni). Nie wyliczaj jej „na siłę” z różnicy łańcucha.
+10. Wymiar przeszkody nieznany → null (np. "h_cm": null, "d_cm": null) + pytanie. Nie pomijaj pól.
+11. Używaj WYŁĄCZNIE wartości wymienionych w formacie: "layer" w "dimension_chains" to tylko "floor" (szafki stojące), "upper" (wiszące) albo "overall" (całość ściany/pomieszczenia); "wall" to tylko A, B, C lub D.
 
 ## Format odpowiedzi
 Odpowiedz WYŁĄCZNIE jednym blokiem kodu \`\`\`json zawierającym obiekt dokładnie w tej strukturze (wartości poniżej to tylko przykład):
