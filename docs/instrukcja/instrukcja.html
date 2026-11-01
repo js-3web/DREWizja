@@ -1,0 +1,278 @@
+<!doctype html>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<title>DREWizja — instrukcja obsługi</title>
+<style>
+  @page { size: A4; margin: 16mm 15mm 18mm; }
+  * { box-sizing: border-box; }
+  body { font-family: "Segoe UI", Roboto, Helvetica, Arial, sans-serif; color: #1f2328; font-size: 11.5pt; line-height: 1.5; margin: 0; }
+  h1 { font-size: 30pt; margin: 0 0 6mm; }
+  h2 { font-size: 17pt; margin: 0 0 3mm; padding-bottom: 2mm; border-bottom: 2px solid #2563eb; color: #1e3a8a; }
+  h3 { font-size: 13pt; margin: 5mm 0 2mm; }
+  p { margin: 0 0 2.5mm; }
+  .page { page-break-after: always; }
+  .page:last-child { page-break-after: auto; }
+  .cover { display: flex; flex-direction: column; justify-content: center; height: 250mm; }
+  .cover .sub { font-size: 15pt; color: #4b5563; margin-bottom: 14mm; }
+  .cover .meta { color: #6b7280; font-size: 10.5pt; }
+  img.shot { width: 100%; border: 1px solid #d0d7de; border-radius: 6px; margin: 2mm 0 3mm; }
+  img.phone { width: 62mm; border: 1px solid #d0d7de; border-radius: 10px; float: right; margin: 0 0 4mm 6mm; }
+  ol, ul { margin: 0 0 3mm; padding-left: 7mm; }
+  li { margin-bottom: 1.2mm; }
+  .n { display: inline-grid; place-items: center; width: 6.2mm; height: 6.2mm; border-radius: 50%; background: #e11d48; color: #fff; font-weight: 700; font-size: 9.5pt; margin-right: 1.5mm; vertical-align: 0.2mm; }
+  .tip { background: #eef6ff; border-left: 4px solid #2563eb; padding: 2.5mm 4mm; margin: 3mm 0; border-radius: 4px; }
+  .warn { background: #fff7e6; border-left: 4px solid #d97706; padding: 2.5mm 4mm; margin: 3mm 0; border-radius: 4px; }
+  .legend li { list-style: none; margin-left: -7mm; }
+  table { border-collapse: collapse; width: 100%; font-size: 10.5pt; margin: 2mm 0 4mm; }
+  td, th { border: 1px solid #d0d7de; padding: 2mm 3mm; vertical-align: top; text-align: left; }
+  th { background: #f3f4f6; }
+  .flow { display: flex; gap: 2mm; flex-wrap: wrap; margin: 3mm 0 5mm; }
+  .flow span { background: #2563eb; color: #fff; padding: 1.5mm 3mm; border-radius: 4mm; font-size: 10pt; font-weight: 600; }
+  .flow b { color: #2563eb; align-self: center; }
+  kbd { border: 1px solid #9ca3af; border-bottom-width: 2px; border-radius: 3px; padding: 0 1.5mm; font-size: 9.5pt; background: #f9fafb; }
+  .clear { clear: both; }
+</style>
+</head>
+<body>
+
+<section class="page cover">
+  <h1>DREWizja</h1>
+  <div class="sub">Instrukcja obsługi — od zdjęcia szkicu do PDF dla klienta</div>
+  <div class="flow">
+    <span>1. Zdjęcie szkicu</span><b>→</b><span>2. Twój czat AI</span><b>→</b><span>3. Sprawdzenie</span><b>→</b><span>4. Model 3D</span><b>→</b><span>5. Kolory</span><b>→</b><span>6. PDF</span>
+  </div>
+  <p><b>Adres aplikacji:</b> https://js-3web.github.io/DREWizja/</p>
+  <p class="meta">Dotyczy wersji aplikacji z listopada 2026 r. Numer wersji widać w prawym górnym rogu aplikacji.</p>
+</section>
+
+<section class="page">
+  <h2>1. Co to jest i czego potrzebujesz</h2>
+  <p><b>DREWizja</b> zamienia Twój odręczny szkic zabudowy (kuchnia, garderoba) w model 3D, w którym możesz zmieniać kolory i materiały, a na koniec tworzy <b>PDF dla klienta</b> z widokiem 3D, rysunkami ścian z wymiarami i listą materiałów.</p>
+  <p><b>Potrzebujesz:</b></p>
+  <ul>
+    <li>telefonu, tabletu lub komputera z przeglądarką (na iPhonie — <b>Safari</b>),</li>
+    <li>dowolnego czatu AI, który rozumie zdjęcia: aplikacja <b>Claude</b> albo <b>ChatGPT</b>,</li>
+    <li>zdjęcia szkicu z wymiarami w centymetrach oraz wymiarów pomieszczenia.</li>
+  </ul>
+  <div class="tip"><b>Ważne:</b> DREWizja sama nie łączy się z żadną sztuczną inteligencją i nie wysyła nigdzie Twoich projektów. Projekty są zapisane <b>tylko na tym urządzeniu</b>. Internet potrzebny jest tylko czatowi AI.</div>
+
+  <h3>Instalacja na iPhonie (raz)</h3>
+  <img class="phone" src="15-iphone.jpg">
+  <ol>
+    <li>Otwórz <b>Safari</b> i wpisz adres <b>js-3web.github.io/DREWizja</b>.</li>
+    <li>Dotknij przycisku <b>Udostępnij</b> (kwadrat ze strzałką w górę) na dole ekranu.</li>
+    <li>Przewiń listę i wybierz <b>„Do ekranu początkowego”</b>, potem <b>„Dodaj”</b>.</li>
+    <li>Od teraz uruchamiaj DREWizję <b>ikoną na ekranie</b> telefonu — działa wtedy także bez internetu, a projekty są lepiej chronione przed usunięciem przez system.</li>
+  </ol>
+  <h3>Na komputerze</h3>
+  <p>Otwórz adres w Chrome lub Edge. Po prawej stronie paska adresu pojawi się ikona <b>„Zainstaluj”</b> — kliknij ją, a DREWizja będzie się otwierać jak zwykły program.</p>
+  <div class="clear"></div>
+</section>
+
+<section class="page">
+  <h2>2. Ekran główny</h2>
+  <img class="shot" src="01-ekran-glowny.jpg">
+  <ul class="legend">
+    <li><span class="n">1</span><b>Ze szkicu</b> — zaczynasz nowy projekt ze zdjęcia szkicu (rozdział 4).</li>
+    <li><span class="n">2</span><b>Lista projektów</b> — przełączanie między zapisanymi projektami.</li>
+    <li><span class="n">3</span><b>PDF</b> — tworzy prezentację dla klienta (rozdział 7).</li>
+    <li><span class="n">4</span><b>⚙ Ustawienia</b> — dane Twojego warsztatu (rozdział 3).</li>
+    <li><span class="n">5</span><b>Zakładki panelu</b>: <i>Element</i> (wymiary i kolory), <i>Projekt</i> (klient, pomieszczenie), <i>Kontrola</i> (błędy), <i>JSON</i> (dla zaawansowanych — możesz go pomijać).</li>
+    <li><span class="n">6</span><b>Pasek stanu</b>: online/offline, rodzaj zapisu i <b>numer wersji</b> aplikacji.</li>
+    <li><span class="n">7</span><b>❓</b> — otwiera tę instrukcję.</li>
+  </ul>
+  <div class="tip"><b>Obracanie modelu 3D:</b> telefon — przesuwaj <b>jednym palcem</b>, przybliżaj i przesuwaj <b>dwoma palcami</b>. Komputer — lewy przycisk myszy obraca, kółko przybliża, prawy przycisk przesuwa.</div>
+  <p>Na telefonie przyciski u góry mieszczą się w jednym wierszu — <b>przesuń pasek palcem w bok</b>, żeby zobaczyć resztę. Przycisk <b>Panel</b> pokazuje i chowa panel z zakładkami.</p>
+</section>
+
+<section class="page">
+  <h2>3. Ustawienia warsztatu (zrób raz)</h2>
+  <img class="shot" src="02-ustawienia.jpg">
+  <ol>
+    <li><span class="n">1</span>Wpisz <b>nazwę warsztatu</b> i <b>kontakt</b> — pojawią się w nagłówku każdego PDF.</li>
+    <li><span class="n">2</span><b>Legenda symboli</b> — jak rysujesz na szkicach (np. „kreskowanie = szkło”). Ten tekst trafia do polecenia dla AI, więc im dokładniej opiszesz swoje oznaczenia, tym mniej poprawek.</li>
+    <li>Niżej są <b>wartości domyślne</b> (wysokość cokołu, głębokość szafek itd.). Aplikacja używa ich <b>tylko wtedy</b>, gdy szkic czegoś nie podaje. Sprawdź, czy pasują do Twojego warsztatu.</li>
+    <li><span class="n">3</span>Kliknij <b>Zapisz</b>.</li>
+  </ol>
+</section>
+
+<section class="page">
+  <h2>4. Nowy projekt ze szkicu</h2>
+  <h3>Krok 1 — dane pomieszczenia</h3>
+  <p>Kliknij <b>📷 Ze szkicu</b>. Wpisz nazwę projektu, klienta i wymiary pomieszczenia w <b>centymetrach</b>.</p>
+  <img class="shot" src="03-kreator-dane.jpg">
+  <ul class="legend">
+    <li><span class="n">1</span><b>Szerokość</b> = długość <b>ściany A</b> (górnej na rzucie). <span class="n">2</span><b>Głębokość</b> = długość <b>ściany B</b> (prawej). <span class="n">3</span><b>Wysokość</b> pomieszczenia.</li>
+    <li><span class="n">4</span>Kliknij <b>Dalej</b>.</li>
+  </ul>
+  <div class="tip"><b>Jak liczyć ściany:</b> patrząc na rzut z góry — <b>A</b> u góry, <b>B</b> po prawej, <b>C</b> na dole, <b>D</b> po lewej (zgodnie z ruchem wskazówek zegara). Zabudowa w L zwykle stoi na ścianach A i B.</div>
+</section>
+
+<section class="page">
+  <h3>Krok 2 — polecenie dla AI</h3>
+  <img class="shot" src="04-kreator-prompt.jpg">
+  <ol>
+    <li><span class="n">1</span>Kliknij <b>Kopiuj prompt</b> (na iPhonie możesz też użyć <b>Udostępnij…</b> i od razu wybrać aplikację Claude lub ChatGPT).</li>
+    <li>Otwórz <b>czat AI</b> i zacznij <b>nową rozmowę</b>.</li>
+    <li>Dołącz <b>zdjęcie szkicu</b> (ikona spinacza lub aparatu w czacie).</li>
+    <li>Wklej skopiowany tekst (przytrzymaj pole wpisywania → <b>Wklej</b>) i wyślij.</li>
+    <li>Poczekaj na odpowiedź. AI odpisze blokiem tekstu z nawiasami <b>{ }</b> — to jest prawidłowe.</li>
+    <li>Skopiuj <b>całą odpowiedź</b> (w czacie jest zwykle przycisk „Kopiuj” pod wiadomością).</li>
+    <li><span class="n">2</span>Wróć do DREWizji i kliknij <b>Mam odpowiedź</b>.</li>
+  </ol>
+  <div class="tip"><b>Zdjęcie szkicu:</b> rób je z góry, przy dobrym świetle, tak żeby cała kartka była w kadrze i liczby były ostre. Im czytelniejsze zdjęcie, tym mniej pól do uzupełniania.</div>
+  <div class="tip">Jeśli przełączysz się do czatu, a telefon zamknie DREWizję — nic się nie stanie. Po powrocie kreator otworzy się w tym samym miejscu.</div>
+</section>
+
+<section class="page">
+  <h3>Krok 3 — wklejenie odpowiedzi</h3>
+  <img class="shot" src="05-kreator-odpowiedz.jpg">
+  <ol>
+    <li><span class="n">1</span>Kliknij <b>Wklej ze schowka</b> albo <span class="n">2</span>przytrzymaj duże pole i wybierz <b>Wklej</b>.</li>
+    <li><span class="n">3</span>Kliknij <b>Sprawdź odczyt</b>.</li>
+  </ol>
+  <div class="warn">Jeśli pojawi się czerwona lista błędów, najczęściej oznacza to, że skopiowano tylko część odpowiedzi. Skopiuj ją jeszcze raz w całości. Gdy błąd się powtarza, napisz w czacie: <i>„Podaj odpowiedź ponownie, wyłącznie jako blok json w podanym formacie”</i>.</div>
+</section>
+
+<section class="page">
+  <h3>Krok 4 — sprawdzenie odczytu (najważniejszy krok)</h3>
+  <p>AI może się pomylić — tu poprawiasz to, co odczytało, <b>zanim</b> powstanie model 3D.</p>
+  <img class="shot" src="06-weryfikacja-gora.jpg">
+  <ul class="legend">
+    <li><span class="n">1</span><b>Czerwona ramka</b> — wymiary, których AI nie odczytało. <b>Trzeba je uzupełnić</b>, inaczej projekt nie powstanie.</li>
+    <li><span class="n">2</span><b>Żółta ramka</b> — pytania AI i rozbieżności wymiarów (np. suma szafek nie zgadza się z wymiarem całkowitym). Przeczytaj je i porównaj ze szkicem.</li>
+  </ul>
+  <p>Pod ramkami jest <b>tabela szafek każdej ściany</b>, od lewej do prawej, tak jak na szkicu. Możesz zmienić typ szafki, szerokość, rodzaj frontów (drzwi, szuflady…) i AGD (zlew, piekarnik, zmywarka). Zaznacz <b>„płyta nad”</b> przy szafce, nad którą w blacie jest płyta grzewcza. Czerwony <b>✕</b> usuwa wiersz.</p>
+</section>
+
+<section class="page">
+  <img class="shot" src="07-weryfikacja-tabela.jpg">
+  <ul class="legend">
+    <li><span class="n">1</span>Pole z <b>„?”</b> — wpisz szerokość w centymetrach (np. <b>45</b> albo <b>86,5</b>) i dotknij gdzie indziej.</li>
+    <li><b>Żółte wiersze</b> = AI było niepewne (poniżej 70%). Sprawdź je ze szkicem. Po poprawce wiersz uznawany jest za pewny.</li>
+    <li>Wiersz <b>„Suma”</b> pod tabelą pomaga porównać z wymiarem ze szkicu.</li>
+    <li><b>Przeszkody</b> (murek, okno, pion) — puste pola uzupełnij, jeśli znasz wymiar. Murek bez głębokości nie będzie sprawdzany pod kątem kolizji z szafkami.</li>
+  </ul>
+</section>
+
+<section class="page">
+  <img class="shot" src="08-weryfikacja-dol.jpg">
+  <ul class="legend">
+    <li><span class="n">1</span><span class="n">2</span><b>Większe poprawki przez AI (opcjonalnie):</b> wpisz uwagi zwykłymi słowami, np. <i>„kreskowanie nad zmywarką to półka otwarta”</i>, kliknij <b>Kopiuj prompt korekty</b> i wklej go <b>w tej samej rozmowie</b> z AI. Nową odpowiedź wklej znowu w kroku 3.</li>
+    <li><span class="n">3</span>Gdy wszystko się zgadza — kliknij <b>Utwórz projekt 3D</b>.</li>
+  </ul>
+  <div class="tip">Drobne rzeczy szybciej poprawisz sam w tabeli. Prompt korekty przydaje się, gdy AI źle zrozumiało większy fragment szkicu.</div>
+</section>
+
+<section class="page">
+  <h2>5. Praca na modelu 3D</h2>
+  <h3>Zmiana wymiarów szafki</h3>
+  <p><b>Dotknij szafki</b> w widoku 3D — podświetli się na niebiesko, a w zakładce <b>Element</b> pojawią się jej dane.</p>
+  <img class="shot" src="09-szafka-zaznaczona.jpg">
+  <ul class="legend">
+    <li><span class="n">1</span><b>Wymiary w milimetrach</b> (szerokość, wysokość, głębokość, wysokość od podłogi). Wpisz nową wartość i dotknij gdzie indziej — fronty dopasują się same.</li>
+    <li><span class="n">2</span><b>Fronty</b> (1 drzwi, 2 drzwi, szuflady, klapa), <b>AGD</b> i <b>Usuń szafkę</b>.</li>
+  </ul>
+  <div class="tip">Pomyłka? Przycisk <b>↶</b> u góry cofa ostatnią zmianę, <b>↷</b> ją przywraca.</div>
+</section>
+
+<section class="page">
+  <h2>6. Kolory i materiały</h2>
+  <img class="shot" src="10-materialy.jpg">
+  <p>Materiały wybierasz w zakładce <b>Element</b>, poniżej danych szafki, w czterech krokach:</p>
+  <ul class="legend">
+    <li><span class="n">1</span><b>Zastosuj dla</b> — tylko zaznaczona szafka, wszystkie szafki, tylko dolne, tylko górne albo słupki.</li>
+    <li><span class="n">2</span><b>Rodzaj materiału</b> — MDF lakierowany, drewno lite, fornir, płyta laminowana.</li>
+    <li><span class="n">3</span><b>Styl frontu</b> — gładki, frezowany (shaker), ramiakowy z płyciną. <b>Szare przyciski są niedostępne</b> dla wybranego materiału (np. ramiak z płyty laminowanej).</li>
+    <li><span class="n">4</span><b>Dekor / kolor</b> — dotknij próbki.</li>
+  </ul>
+  <p>Niżej znajdziesz <b>korpusy</b>, <b>blat</b> i <b>uchwyty</b>. W MDF lakierowanym jest też <b>„Własny kolor lakieru (RAL / NCS)”</b> — wpisz kod i dobierz kolor na oko; kod trafi do PDF.</p>
+  <div class="warn"><b>Kolory na ekranie są orientacyjne.</b> Ekran nie odda koloru wiernie — ostateczny wybór zawsze na fizycznych próbkach. Taki dopisek jest też w PDF dla klienta.</div>
+</section>
+
+<section class="page">
+  <h2>7. Kontrola i PDF dla klienta</h2>
+  <h3>Zakładka „Kontrola”</h3>
+  <img class="shot" src="11-kontrola.jpg">
+  <p><span class="n">1</span>Aplikacja sama sprawdza projekt. Liczba przy zakładce mówi, ile jest uwag:</p>
+  <table>
+    <tr><th>Rodzaj</th><th>Co znaczy</th><th>Co zrobić</th></tr>
+    <tr><td><b style="color:#b91c1c">Błąd</b> (czerwony)</td><td>Coś się fizycznie nie zmieści: szafki dłuższe niż ściana, wyższe niż sufit, kolizja, szafka w murku.</td><td>Popraw wymiary. <b>Błędy blokują PDF.</b></td></tr>
+    <tr><td><b style="color:#b45309">Ostrzeżenie</b> (żółty)</td><td>Coś nietypowego, np. zmywarka 50 cm, rozbieżność wymiarów na szkicu.</td><td>Sprawdź. Nie blokuje PDF.</td></tr>
+    <tr><td><b style="color:#1e3a8a">Info</b> (niebieski)</td><td>Przypomnienia: odległość nad płytą wg instrukcji producenta, kotwienie wysokich szafek.</td><td>Pamiętaj przy montażu.</td></tr>
+  </table>
+  <p>Dotknięcie komunikatu zaznacza szafkę, której dotyczy.</p>
+</section>
+
+<section class="page">
+  <h3>Zakładka „Projekt”</h3>
+  <img class="shot" src="12-zakladka-projekt.jpg">
+  <ul class="legend">
+    <li><span class="n">1</span>Nazwa, klient i <b>wymiary pomieszczenia</b> (w mm). Pole <b>Uwagi</b> trafia do PDF.</li>
+    <li><span class="n">2</span><b>Otwarte pytania</b> z odczytu szkicu — gdy je wyjaśnisz, kliknij <b>„wyjaśnione ✓”</b>.</li>
+  </ul>
+</section>
+
+<section class="page">
+  <h3>Tworzenie PDF</h3>
+  <img class="shot" src="13-pdf-gotowy.jpg">
+  <ol>
+    <li>Kliknij <b>📄 PDF</b> u góry i poczekaj kilka sekund.</li>
+    <li><span class="n">1</span>Na dole pojawi się <b>„PDF gotowy”</b> — kliknij <b>Pobierz</b>. Na iPhonie jest też <b>Udostępnij…</b>: wyślesz PDF prosto przez WhatsApp, SMS lub e-mail.</li>
+  </ol>
+  <p><b>PDF zawiera:</b></p>
+  <ul>
+    <li>stronę tytułową z widokiem 3D zabudowy, nazwą klienta i wymiarami pomieszczenia,</li>
+    <li>osobną stronę dla każdej ściany z szafkami — rysunek z <b>wymiarami w centymetrach</b> (szerokości szafek, wysokości),</li>
+    <li>stronę <b>„Materiały i kolory”</b> — fronty, korpusy, blat, uchwyty, z próbkami kolorów.</li>
+  </ul>
+  <div class="warn">Jeśli zamiast PDF pojawi się komunikat <b>„PDF zablokowany”</b> — projekt ma błędy. Otwórz zakładkę <b>Kontrola</b>, popraw je i spróbuj ponownie.</div>
+</section>
+
+<section class="page">
+  <h2>8. Warianty, widoki i kopia zapasowa</h2>
+  <img class="shot" src="14-pasek-narzedzi.jpg">
+  <ul class="legend">
+    <li><span class="n">1</span><b>Kopia</b> — tworzy kopię projektu. Użyj jej, gdy chcesz pokazać klientowi <b>dwa warianty</b> (np. biały shaker i dąb) — każdy wariant to osobny projekt na liście.</li>
+    <li><span class="n">2</span><b>Widok</b> — gotowe ustawienia kamery: izometria, front ściany A, front ściany B, „wzrok człowieka”.</li>
+    <li><span class="n">3</span><b>Eksport</b> — zapisuje projekt do pliku (kopia zapasowa, przeniesienie na inne urządzenie).</li>
+    <li><span class="n">4</span><b>Import</b> — wczytuje taki plik.</li>
+    <li><span class="n">5</span><b>↶ ↷</b> — cofnij / ponów.</li>
+  </ul>
+  <p>Przycisk <b>＋ Szablon</b> tworzy przykładową kuchnię w L — dobra do nauki i zabawy. <b>🗑</b> usuwa projekt z urządzenia (zapyta o potwierdzenie). Przycisk <b>Ściany</b> chowa i pokazuje ściany pomieszczenia.</p>
+  <div class="warn"><b>Rób kopię zapasową!</b> Projekty są tylko na tym urządzeniu. Telefon i komputer mają <b>osobne</b> projekty. Wyczyszczenie danych przeglądarki albo usunięcie aplikacji kasuje projekty. Ważne projekty zapisuj przyciskiem <b>Eksport</b> (np. do iCloud, na Dysk Google albo wyślij sobie mailem).</div>
+</section>
+
+<section class="page">
+  <h2>9. Najczęstsze problemy</h2>
+  <table>
+    <tr><th style="width:38%">Problem</th><th>Rozwiązanie</th></tr>
+    <tr><td>Po poprawce aplikacji nadal widzę stary błąd albo brakuje nowych przycisków.</td><td>Telefon używa starej kopii aplikacji. Zamknij DREWizję całkowicie (przesuń ją w górę na liście otwartych aplikacji) i otwórz ponownie. Na komputerze naciśnij <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>R</kbd>. Sprawdź <b>numer wersji</b> w prawym górnym rogu.</td></tr>
+    <tr><td>„Nie znaleziono JSON w odpowiedzi”.</td><td>Skopiowano tylko część odpowiedzi AI albo AI odpisało zwykłym tekstem. Skopiuj całą odpowiedź albo poproś AI: „Podaj wynik wyłącznie jako blok json”.</td></tr>
+    <tr><td>Czerwone błędy w kroku 3 z nazwami pól (np. <i>type</i>, <i>kind</i>).</td><td>AI użyło słowa spoza listy. Poproś w czacie: „Użyj tylko wartości z podanego formatu” i wklej nową odpowiedź.</td></tr>
+    <tr><td>Przycisk „Utwórz projekt 3D” jest szary.</td><td>W tabeli są pola z „?” — uzupełnij brakujące szerokości.</td></tr>
+    <tr><td>„PDF zablokowany”.</td><td>Projekt ma błędy — zakładka <b>Kontrola</b>.</td></tr>
+    <tr><td>Szafki są w złym miejscu albo na złej ścianie.</td><td>Sprawdź w kroku 1 szerokość (ściana A) i głębokość (ściana B). W poprawce dla AI napisz np. „lodówka stoi na ścianie B, nie A”.</td></tr>
+    <tr><td>Nie widzę panelu z zakładkami (telefon).</td><td>Przesuń pasek przycisków u góry w bok i dotknij <b>Panel</b>.</td></tr>
+    <tr><td>Zniknęły projekty.</td><td>Sprawdź, czy otwierasz aplikację z tej samej ikony / przeglądarki. Jeśli dane zostały wyczyszczone — wczytaj plik z <b>Eksportu</b> przyciskiem <b>Import</b>.</td></tr>
+  </table>
+</section>
+
+<section class="page">
+  <h2>Ściągawka</h2>
+  <ol style="font-size:12.5pt">
+    <li><b>📷 Ze szkicu</b> → wymiary pomieszczenia w cm → <b>Dalej</b>.</li>
+    <li><b>Kopiuj prompt</b> → czat AI: nowa rozmowa + <b>zdjęcie szkicu</b> + wklej → wyślij.</li>
+    <li>Skopiuj <b>całą</b> odpowiedź AI → <b>Mam odpowiedź</b> → wklej → <b>Sprawdź odczyt</b>.</li>
+    <li>Uzupełnij pola <b>„?”</b>, sprawdź <b>żółte</b> wiersze i pytania → <b>Utwórz projekt 3D</b>.</li>
+    <li>Dotknij szafki → popraw wymiary. Wybierz materiały: <b>zakres → rodzaj → styl → kolor</b>.</li>
+    <li>Zakładka <b>Kontrola</b>: zero czerwonych błędów.</li>
+    <li><b>📄 PDF</b> → <b>Pobierz</b> / <b>Udostępnij</b> klientowi.</li>
+    <li>Ważne projekty: <b>Eksport</b> (kopia zapasowa).</li>
+  </ol>
+  <div class="tip" style="margin-top:8mm">Dwa warianty dla klienta? <b>Kopia</b> projektu → zmień materiały → osobny PDF dla każdego wariantu.</div>
+</section>
+
+</body>
+</html>

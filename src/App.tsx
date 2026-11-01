@@ -275,6 +275,15 @@ export default function App() {
         <button onClick={remove} className="danger" title="Usuń projekt z tego urządzenia">
           🗑
         </button>
+        <a
+          className="btn"
+          href={`${import.meta.env.BASE_URL}instrukcja-DREWizja.pdf`}
+          target="_blank"
+          rel="noopener"
+          title="Instrukcja obsługi (PDF)"
+        >
+          ❓
+        </a>
         <button onClick={() => setSettingsOpen(true)} title="Ustawienia warsztatu">
           ⚙
         </button>

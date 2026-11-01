@@ -509,3 +509,15 @@ button.link.danger {
   border-color: var(--danger);
   background: #fde8e8;
 }
+a.btn {
+  font-size: 14px;
+  padding: 6px 10px;
+  min-height: 36px;
+  display: inline-flex;
+  align-items: center;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--panel);
+  color: var(--text);
+  text-decoration: none;
+}
