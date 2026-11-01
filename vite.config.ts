@@ -7,8 +7,14 @@ import { VitePWA } from 'vite-plugin-pwa'
 // Ustawiane w workflow .github/workflows/deploy.yml.
 const base = process.env.BASE_PATH ?? '/'
 
+// Numer wersji widoczny w aplikacji: data budowania + skrót commita (GITHUB_SHA ustawia GitHub Actions).
+// Dzięki temu łatwo sprawdzić, czy telefon ma już najnowszą wersję.
+const buildDate = new Date().toISOString().slice(0, 16).replace('T', ' ')
+const appVersion = `${buildDate} UTC${process.env.GITHUB_SHA ? ' · ' + process.env.GITHUB_SHA.slice(0, 7) : ' · lokalna'}`
+
 export default defineConfig({
   base,
+  define: { __APP_VERSION__: JSON.stringify(appVersion) },
   plugins: [
     react(),
     // PWA: manifest (instalacja na ekranie początkowym) + service worker (praca offline).

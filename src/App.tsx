@@ -281,7 +281,8 @@ export default function App() {
         <button onClick={() => setPanelOpen(!panelOpen)}>{panelOpen ? 'Ukryj panel' : 'Panel'}</button>
         <span className={`status ${online ? 'on' : 'off'}`} title="Stan połączenia i zapisu lokalnego">
           {online ? 'online' : 'offline'} ·{' '}
-          {persisted ? 'zapis trwały' : persisted === false ? 'zapis nietrwały' : 'zapis lokalny'}
+          {persisted ? 'zapis trwały' : persisted === false ? 'zapis nietrwały' : 'zapis lokalny'} · wersja{' '}
+          {__APP_VERSION__}
         </span>
       </header>
 

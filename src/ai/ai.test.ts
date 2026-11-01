@@ -235,3 +235,13 @@ describe('tolerancja na odpowiedzi innych czatów AI (błędy zgłoszone z ChatG
     if (!r.ok) expect(r.errors[0]).toContain('wartość spoza listy')
   })
 })
+
+describe('łańcuch wymiarowy z nieznaną nazwą warstwy', () => {
+  it('nieznana warstwa (np. "elevation") → "overall" zamiast odrzucenia całego odczytu', () => {
+    const r = parseReading(
+      '{"runs":[{"wall":"A","floor":[{"type":"base","width_cm":60}]}],"dimension_chains":[{"wall":"A","layer":"elevation","segments_cm":[60],"total_cm":60}]}',
+    )
+    expect(r.ok).toBe(true)
+    if (r.ok) expect(r.reading.dimension_chains[0].layer).toBe('overall')
+  })
+})

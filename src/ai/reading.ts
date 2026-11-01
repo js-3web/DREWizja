@@ -29,7 +29,12 @@ const optPos = z.preprocess(
  * Enum z synonimami: wartość jest normalizowana (małe litery, bez spacji/myślników) i tłumaczona przez słownik.
  * Przykład: chainLayer("Base") → "floor".
  */
-function synonymEnum<const T extends readonly [string, ...string[]]>(values: T, synonyms: Record<string, T[number]>) {
+function synonymEnum<const T extends readonly [string, ...string[]]>(
+  values: T,
+  synonyms: Record<string, T[number]>,
+  /** Wartość zastępcza dla nieznanych wartości — tylko tam, gdzie pomyłka jest nieszkodliwa. */
+  fallback?: T[number],
+) {
   return z.preprocess((v) => {
     if (typeof v !== 'string') return v
     const k = v
@@ -37,7 +42,7 @@ function synonymEnum<const T extends readonly [string, ...string[]]>(values: T, 
       .trim()
       .replace(/[\s_-]+/g, '')
     const direct = values.find((x) => x.toLowerCase().replace(/[\s_-]+/g, '') === k)
-    return direct ?? synonyms[k] ?? v
+    return direct ?? synonyms[k] ?? fallback ?? v
   }, z.enum(values))
 }
 
@@ -115,22 +120,27 @@ const OBSTACLE_KIND = synonymEnum(['murek', 'window', 'door', 'pipe', 'radiator'
   heater: 'radiator',
 })
 
-const CHAIN_LAYER = synonymEnum(['floor', 'upper', 'overall'] as const, {
-  base: 'floor',
-  lower: 'floor',
-  bottom: 'floor',
-  dolne: 'floor',
-  wall: 'upper',
-  top: 'upper',
-  gorne: 'upper',
-  górne: 'upper',
-  total: 'overall',
-  room: 'overall',
-  plan: 'overall',
-  wallsegment: 'overall',
-  całość: 'overall',
-  calosc: 'overall',
-})
+const CHAIN_LAYER = synonymEnum(
+  ['floor', 'upper', 'overall'] as const,
+  {
+    base: 'floor',
+    lower: 'floor',
+    bottom: 'floor',
+    dolne: 'floor',
+    wall: 'upper',
+    top: 'upper',
+    gorne: 'upper',
+    górne: 'upper',
+    total: 'overall',
+    room: 'overall',
+    plan: 'overall',
+    wallsegment: 'overall',
+    całość: 'overall',
+    calosc: 'overall',
+  },
+  // Łańcuch służy wyłącznie do kontroli sum — nieznana warstwa (np. "front", "elevation") liczy się jako „całość”.
+  'overall',
+)
 
 export const ReadingWall = z.preprocess(
   (v) => (typeof v === 'string' ? v.trim().toUpperCase() : v),
